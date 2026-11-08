@@ -28,7 +28,7 @@ const ICONS = {
 $('app').innerHTML = `
 <main class="call-screen">
   <header class="call-top">
-    <div class="e2e">${ICONS.lock}<span>VoiceShield · Encrypted audio call</span></div>
+    <div class="e2e">${ICONS.lock}<span>Sentrix · Encrypted audio call</span></div>
     <span class="connection-tag" id="connection-tag"><span class="status-dot"></span><span id="top-status">Ready</span></span>
   </header>
 
@@ -354,3 +354,7 @@ function renderCombined() {
   $('combined-panel').hidden = selectedRole !== 'receiver';
 }
 renderCombined();
+
+// Sentrix receiver-only one-time fraud and spoken warning (preserved by UI merge).
+import "./receiver_warning.js";
+import "./ver12-warning-layout.css";

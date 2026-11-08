@@ -296,3 +296,28 @@ body[data-call="connecting"] .role-switch { display: none; }
 @media (min-width: 520px) {
   .call-screen { border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 }
+
+/* VoiceShield call screen cleanup: hide diagnostics and top-right status — 2026-11-08 */
+/* Keep the status DOM node alive: LiveKit and the alert worker read it. */
+#connection-tag { display: none !important; }
+
+/* Both roles should see a clean call screen rather than model output/logs. */
+#combined-panel,
+#detector-panel,
+#fraud-panel { display: none !important; }
+/* Normal connection chatter is hidden; genuine connection errors remain visible. */
+#info:not(.error) { display: none !important; }
+
+/* The caller never sees receiver-only controls or receiver fraud warnings. */
+body:not(.vs-receiver-silent) #vs-audio-controls,
+body:not(.vs-receiver-silent) #vs-receiver-warning { display: none !important; }
+
+/* Current ver1.2 compact button: stay compact but visually signal OFF. */
+#vs-audio-controls.vs-audio-compact[data-state="disabled"] #vs-enable-spoken-warnings {
+  border-color: #45545b;
+  background: #213038;
+  color: #b4c3c8;
+}
+#vs-audio-controls.vs-audio-compact[data-state="enabled"] #vs-enable-spoken-warnings {
+  cursor: pointer;
+}

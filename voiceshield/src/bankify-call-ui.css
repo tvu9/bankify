@@ -1,0 +1,173 @@
+/* VoiceShield / Bankify-style live call skin, mobile-first.
+   CSS-only: never replaces any LiveKit, PellaV2, Whisper, semantic, or warning event handler.
+   Intentionally scoped to existing selectors from the LiveKit Vite calling app.
+   Warning components are not hidden or recreated. */
+:root {
+  --vs-bg: #07111f;
+  --vs-bg-deep: #050c16;
+  --vs-panel: #0c1929;
+  --vs-panel-light: #102033;
+  --vs-border: rgba(255,255,255,.10);
+  --vs-text: #e7edf5;
+  --vs-muted: #9aabbe;
+  --vs-blue: #3b8ede;
+  --vs-blue-bright: #54a7f5;
+  --vs-green: #64d39a;
+  --vs-red: #ff6b6b;
+}
+html { color-scheme: dark; }
+body {
+  color:var(--vs-text);
+  background:radial-gradient(ellipse 100% 42% at 50% -9%, rgba(59,142,222,.19), transparent 78%), var(--vs-bg-deep);
+  min-height:100dvh;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+#app { min-height:100dvh; }
+#app .app-shell {
+  width:min(100%,560px);
+  max-width:560px;
+  min-height:100dvh;
+  margin-inline:auto;
+  padding:clamp(16px,4vw,30px) clamp(14px,4vw,24px) calc(22px + env(safe-area-inset-bottom));
+}
+#app .topbar { gap:10px; margin-bottom:clamp(17px,4vw,28px); }
+#app .brand { gap:11px; min-width:0; }
+#app .brand .logo {
+  width:44px; height:44px; flex-shrink:0;
+  border-radius:14px; font-size:24px;
+  color:#91d3ff;
+  background:linear-gradient(145deg,rgba(84,167,245,.24),rgba(59,142,222,.07));
+  border:1px solid rgba(84,167,245,.34);
+  box-shadow:0 8px 26px rgba(0,0,0,.12);
+}
+#app .brand strong { font-weight:800; letter-spacing:-.5px; font-size:clamp(17px,4.6vw,21px); }
+#app .brand small { margin-top:3px; letter-spacing:.15em; color:var(--vs-muted); font-size:9px; }
+#app .connection-tag {
+  min-height:34px; gap:7px; padding:8px 12px;
+  color:#c5d2e4; background:rgba(255,255,255,.025); border:1px solid var(--vs-border);
+  font-size:11px; white-space:nowrap; font-weight:700;
+}
+#app .status-dot { background:#e9c46a; }
+#app .connection-tag.connected { color:#b9f0d1; border-color:rgba(100,211,154,.4); }
+#app .connected .status-dot { background:var(--vs-green); box-shadow:0 0 10px rgba(100,211,154,.60); }
+#app .phone-frame {
+  border-radius:28px;
+  background:var(--vs-panel);
+  border:1px solid var(--vs-border);
+  box-shadow:0 24px 65px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.045);
+  overflow:hidden;
+}
+#app .phone-frame .upper {
+  padding:clamp(30px,7vw,50px) 18px 29px;
+  background:
+    radial-gradient(ellipse 57% 70% at 50% 29%,rgba(59,142,222,.22),transparent 100%),
+    linear-gradient(180deg,#102238 0%,#0c1929 100%);
+  position:relative;
+  border-bottom:1px solid rgba(255,255,255,.055);
+}
+#app .eyebrow {
+  margin-bottom:clamp(23px,6vw,31px);
+  color:#8eaed1; letter-spacing:.17em; font-size:10px; font-weight:800;
+}
+#app .avatar {
+  width:110px; height:110px; margin-bottom:22px;
+  color:#b2d9f8;
+  background:linear-gradient(150deg,rgba(61,134,213,.35),rgba(7,17,31,.62));
+  border:1px solid rgba(122,180,243,.42);
+  box-shadow:0 0 0 9px rgba(84,167,245,.055),0 0 0 20px rgba(84,167,245,.025),0 22px 34px rgba(0,0,0,.16);
+}
+#app .avatar svg { width:66px; }
+#app .phone-frame h1 {
+  color:#f6f9ff; font-size:clamp(27px,7vw,34px); font-weight:780;
+  letter-spacing:-1.2px; margin:0 0 8px;
+}
+#app .peer-subtitle { color:#9eafc6; font-size:13px; }
+#app .timer {
+  margin-top:19px; font-size:clamp(19px,5vw,24px); font-weight:650;
+  letter-spacing:.14em; color:#e5f2ff; font-variant-numeric:tabular-nums;
+}
+#app .wave { margin-top:20px; height:34px; }
+#app .wave i { background:var(--vs-blue-bright); box-shadow:0 0 7px rgba(84,167,245,.10); }
+#app .phone-frame .bottom { padding:25px clamp(18px,5vw,30px) 29px; }
+#app .field-label { display:block; color:#97aabd; letter-spacing:.15em; font-size:10px; }
+#app .role-buttons { background:#071322; border:1px solid var(--vs-border); border-radius:14px; margin-top:11px; padding:5px; gap:4px; }
+#app .role-btn {
+  color:#a9b9c9; min-height:45px; border-radius:11px; font-size:14px;
+  -webkit-tap-highlight-color:transparent;
+}
+#app .role-btn.selected {
+  background:linear-gradient(135deg,#2664a7,#1a4e89);
+  color:#fff; box-shadow:0 3px 12px rgba(20,70,130,.31);
+}
+#app .controls { display:flex; gap:clamp(25px,9vw,58px); margin:26px 0 24px; }
+#app .control { min-width:100px; font-size:13px; color:#b9c9db; }
+#app .control-icon {
+  width:65px; height:65px;
+  color:#d7eaff; background:#152a43;
+  border:1px solid rgba(132,174,218,.23);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 7px 20px rgba(0,0,0,.15);
+  transition:background-color .15s,border-color .15s,transform .15s;
+}
+#app .control:not(:disabled):active .control-icon { transform:scale(.96); }
+#app .control.off .control-icon { background:#49252f; border-color:#a25667; }
+#app .primary-call {
+  min-height:60px; width:100%; border-radius:15px;
+  background:linear-gradient(115deg,#67d8a3,#42bd88);
+  color:#062416; font-weight:800; box-shadow:0 10px 25px rgba(56,194,143,.16);
+  letter-spacing:.01em; transition:filter .15s,transform .15s;
+}
+#app .primary-call:not(:disabled):active { transform:scale(.993); }
+#app .primary-call.hangup {
+  background:linear-gradient(115deg,#ff7577,#e95062);
+  color:#fff; box-shadow:0 10px 25px rgba(233,80,98,.19);
+}
+#app .security-line { margin-top:17px; color:#8294a9; font-size:11px; line-height:1.55; }
+#app .info {
+  margin-top:15px; background:rgba(16,32,51,.72);
+  border:1px solid var(--vs-border); border-radius:13px; color:#b5c6d9;
+  font-size:12px; line-height:1.6;
+}
+#app .info.error { border-color:rgba(255,107,107,.53); color:#ffd1d1; background:#3d2029; }
+#app .detector-panel {
+  background:#0d2035; border-color:rgba(84,167,245,.22); border-radius:15px;
+}
+#app footer { color:#70849b; margin-top:20px; font-size:11px; }
+#app button:focus-visible, #vs-receiver-warning button:focus-visible, #vs-audio-controls button:focus-visible {
+  outline:3px solid #85c2ff; outline-offset:3px;
+}
+/* Preserve receiver-only hidden logs and one-time alert behavior. */
+body.vs-receiver-silent #detector-panel,
+body.vs-receiver-silent #fraud-panel,
+body.vs-receiver-silent #combined-panel { display:none !important; }
+#vs-receiver-warning.vs-alert {
+  background:linear-gradient(160deg,#48222c,#281923);
+  border-color:var(--vs-red);
+  box-shadow:0 14px 30px rgba(0,0,0,.25);
+  border-radius:16px;
+}
+#vs-receiver-warning .vs-alert-head { line-height:1.35; }
+#vs-audio-controls {
+  background:rgba(16,32,51,.74);
+  border-color:rgba(84,167,245,.33);
+  color:#cbd9e7;
+}
+#vs-audio-controls button, #vs-receiver-warning button {
+  min-height:44px;
+  font-weight:700;
+}
+#vs-audio-controls button { background:#133960; border-color:rgba(84,167,245,.6); color:#f4f8ff; }
+@media(max-width:380px) {
+  #app .app-shell { padding:13px 12px calc(18px + env(safe-area-inset-bottom)); }
+  #app .topbar { margin-bottom:15px; }
+  #app .phone-frame { border-radius:22px; }
+  #app .phone-frame .upper { padding-top:25px; padding-bottom:22px; }
+  #app .avatar { width:98px; height:98px; }
+  #app .controls { gap:20px; }
+  #app .control { min-width:90px; }
+  #app .control-icon { width:59px; height:59px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #app .wave.animated i { animation:none !important; }
+  #app .control-icon, #app .primary-call { transition:none; }
+}
