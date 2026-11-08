@@ -1,0 +1,26 @@
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+venv-*/
+__pycache__/
+*.py[cod]
+
+# AI model weights and generated binaries
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Sensitive and generated files
+.env
+.env.*
+!.env.example
+*token*
+*secret*
+*.log
+*.wav
+*.mp3
+*.mp4
+.DS_Store
