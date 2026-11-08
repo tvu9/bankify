@@ -1,0 +1,24 @@
+/* Compatibility layer: keep the receiver-only one-time warning visible on a mobile call. */
+#vs-receiver-warning.vs-alert:not([hidden]) {
+  position: fixed;
+  z-index: 1000;
+  top: calc(54px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(430px, calc(100vw - 24px));
+  max-height: calc(100dvh - 170px);
+  overflow-y: auto;
+  margin: 0;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, .6);
+}
+/* Ensure the spoken-alert opt-in is reachable on narrow phones. */
+#vs-audio-controls:not([hidden]) {
+  width: 100%;
+  max-width: 100%;
+}
+/* Preserve silent receiver monitoring even if frontend styles change. */
+body.vs-receiver-silent #combined-panel,
+body.vs-receiver-silent #detector-panel,
+body.vs-receiver-silent #fraud-panel {
+  display: none !important;
+}

@@ -25,7 +25,8 @@ ambiguous references. Assume the speaker is discussing ordinary matters unless
 NEW_SPEECH itself shows a suspicious REQUEST or THREAT.
 
 HIGH: a direct request for another person's sensitive information (password,
-security/verification code, bank or payment details, government ID), a request
+security/verification code, bank or payment details, government ID,
+Social Security number (SSN, S S N, S.S.N.)), a request
 to transfer money to a suspicious destination, a coercive demand or remote access.
 ELEVATED: a plausible but incomplete suspicious request (with concrete evidence).
 UNRESOLVED: everyday conversation, protective advice, story/fiction, discussion
@@ -200,8 +201,33 @@ _PROTECTIVE = re.compile(
 _QUOTING = re.compile(r'\b(?:he|she|they|someone|scammer|fraudster)\s+(?:asked|asks|said|says|told)\b', re.I)
 
 
+# Sentrix spoken SSN alias normalization v1
+# Whisper may transcribe the same abbreviation as S S N, S.S.N., or S-S-N.
+# Normalize *only* these well-bounded sequences for the direct sensitive-request
+# guardrail; do not transform the retained transcript or send a fabricated quote.
+_SPOKEN_SSN = re.compile(
+    r'(?<!\w)s(?:\s*[.\-]\s*|\s+)s(?:\s*[.\-]\s*|\s+)n\.?(?!\w)', re.I)
+_SPOKEN_SOCIAL_SECURITY = re.compile(
+    r'\bsocial[\s-]+security(?:[\s-]+number)?\b', re.I)
+_SSN_DEFINITION = re.compile(
+    r'\b(?:what\s+does\s+ssn\s+(?:mean|stand\s+for)|'
+    r'what\s+is\s+(?:an?\s+|the\s+)?ssn\b|'
+    r'(?:tell\s+me|can\s+you\s+explain|please\s+explain)\s+'
+    r'(?:what\s+)?ssn\s+(?:means|stands\s+for|is)\b)', re.I)
+
+def _normalize_sensitive_abbreviation(text):
+    text = _SPOKEN_SSN.sub('SSN', text)
+    text = _SPOKEN_SOCIAL_SECURITY.sub('Social Security number', text)
+    return text
+
+
 def _explicit_sensitive_request(new_speech):
-    text = new_speech.strip()
+    text = _normalize_sensitive_abbreviation(new_speech.strip())
+    # Educational discussion of the abbreviation is not itself a request
+    # to disclose someone's identifier.
+    if _SSN_DEFINITION.search(text) and not re.search(
+            r'\b(?:your|give|send|provide|share|reveal|read)\b', text, re.I):
+        return None
     if _PROTECTIVE.search(text) or _QUOTING.search(text) or not _REQUEST.search(text):
         return None
     # Require request cues in the same local clause as the sensitive object.
