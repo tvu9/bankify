@@ -15,42 +15,77 @@ let joined = false;
 let connecting = false;
 const audioElements = new Map();
 
+const ICONS = {
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>',
+  micOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M9 9v1a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M5 10a7 7 0 0 0 11.6 5.3M19 10a7 7 0 0 1-.5 2.6M12 17v4"/></svg>',
+  speaker: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  speakerOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg>',
+};
+
 $('app').innerHTML = `
-<main class="app-shell">
- <header class="topbar"><div class="brand"><span class="logo">◈</span><div><strong>VoiceShield</strong><small>SECURE AUDIO LAB</small></div></div><span class="connection-tag" id="connection-tag"><span class="status-dot"></span><span id="top-status">Ready</span></span></header>
- <section class="phone-frame" aria-label="Voice call control panel">
-   <div class="upper"><div class="eyebrow">PRIVATE AUDIO SESSION</div><div class="avatar" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="27" r="12" stroke="currentColor" stroke-width="2.5"/><path d="M19 65c0-14 9-22 21-22s21 8 21 22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-   <h1 id="peer-title">Receiver</h1><p class="peer-subtitle" id="peer-subtitle">Waiting to start a call</p><div class="timer" id="call-timer">00:00</div>
-   <div class="wave" id="wave" aria-label="Audio activity"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
-   <div class="bottom">
-    <div class="role-area"><span class="field-label">THIS PHONE IS</span><div class="role-buttons" role="group" aria-label="Choose phone role"><button id="role-caller" class="role-btn" type="button">Caller</button><button id="role-receiver" class="role-btn" type="button">Receiver</button></div></div>
-    <div class="controls"><button id="mute-btn" class="control" type="button" disabled aria-label="Mute microphone"><span class="control-icon" id="mic-icon">🎙</span><span id="mute-label">Mute</span></button><button id="speaker-btn" class="control active" type="button" disabled aria-label="Toggle speaker"><span class="control-icon" id="speaker-icon">🔊</span><span id="speaker-label">Speaker on</span></button></div>
-    <button type="button" id="join-btn" class="primary-call"><span id="join-icon">☎</span><span id="join-label">Start audio call</span></button>
-    <div class="security-line"><span>🔒</span> Audio-only encrypted transport · No camera</div>
-   </div>
- </section>
- <div class="info" id="info" role="status" aria-live="polite">Choose your role and start the call. On the other phone, choose the opposite role.</div>
- <section class="detector-panel" id="detector-panel" aria-live="polite">
-  <div class="detector-heading"><span>◉ VoiceShield AI voice monitoring</span><span id="detector-state">Offline</span></div>
-  <div class="detector-message" id="detector-message">Waiting for the PellaV2 detection worker…</div>
-  <div class="detector-score" id="detector-score">No analysis yet</div>
-  <div class="detector-score" id="audio-quality">Audio: waiting for caller</div>
-  <div class="detector-note">PellaV2 experimental model output. Not a calibrated probability or proof of human identity. Verify requests independently.</div>
- </section>
- <section class="detector-panel" id="fraud-panel" aria-live="polite">
-  <div class="detector-heading"><span>◇ VoiceShield V3.2 + Speech Recognition</span><span id="fraud-state">Offline</span></div>
-  <div class="detector-message" id="fraud-message">Transcription worker not connected</div>
-  <div class="detector-score" id="fraud-indicators">No scam-language evidence yet</div>
-  <div class="detector-score" id="fraud-identity">Identity: not independently verified</div>
-  <div class="detector-note">Experimental phrase screening. No match does not mean a call is safe. AI voice is not proof of fraud; a human voice is not proof of legitimacy. Don't share verification codes or move funds based solely on a call.</div>
- </section>
- <section class="detector-panel" id="combined-panel" aria-live="polite">
-  <div class="detector-heading"><span>♢ Combined call safety</span><span>Unverified</span></div>
-  <div class="detector-message" id="combined-message">Monitoring both signals. No result establishes that the caller is safe.</div>
-  <div class="detector-note">Voice authenticity and scam-language cues are different signals. Verification must happen via a known trusted channel.</div>
- </section>
- <footer>Local development prototype • Not a cellular phone call</footer>
- <div id="audio-container" aria-hidden="true"></div>
+<main class="call-screen">
+  <header class="call-top">
+    <div class="e2e">${ICONS.lock}<span>VoiceShield · Encrypted audio call</span></div>
+    <span class="connection-tag" id="connection-tag"><span class="status-dot"></span><span id="top-status">Ready</span></span>
+  </header>
+
+  <section class="peer" aria-label="Call status">
+    <h1 id="peer-title">Receiver</h1>
+    <p class="peer-subtitle" id="peer-subtitle">Waiting to start a call</p>
+    <div class="timer" id="call-timer">00:00</div>
+    <div class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 80 80" fill="currentColor"><circle cx="40" cy="29" r="14"/><path d="M14 72c0-15 11.5-24 26-24s26 9 26 24z"/></svg>
+    </div>
+    <div class="wave" id="wave" aria-label="Audio activity"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </section>
+
+  <section class="feed" aria-label="Call safety">
+    <div class="notice" id="info" role="status" aria-live="polite"></div>
+
+    <article class="card" id="combined-panel" aria-live="polite">
+      <div class="card-head"><span class="card-title">${ICONS.shield}Call safety</span><span class="pill">Unverified</span></div>
+      <p class="card-message" id="combined-message">Monitoring both signals. No result establishes that the caller is safe.</p>
+      <p class="card-note">Voice authenticity and scam-language cues are separate signals. Verify through a channel you already trust.</p>
+    </article>
+
+    <article class="card" id="detector-panel" aria-live="polite">
+      <div class="card-head"><span class="card-title">Voice analysis</span><span class="pill" id="detector-state">Offline</span></div>
+      <p class="card-message" id="detector-message">Waiting for the PellaV2 detection worker…</p>
+      <p class="card-meta" id="detector-score">No analysis yet</p>
+      <p class="card-meta" id="audio-quality">Audio: waiting for caller</p>
+      <p class="card-note">Experimental model output. Not a calibrated probability or proof of identity.</p>
+    </article>
+
+    <article class="card" id="fraud-panel" aria-live="polite">
+      <div class="card-head"><span class="card-title">Conversation screening</span><span class="pill" id="fraud-state">Offline</span></div>
+      <p class="card-message" id="fraud-message">Transcription worker not connected</p>
+      <p class="card-meta" id="fraud-indicators">No scam-language evidence yet</p>
+      <p class="card-meta" id="fraud-identity">Identity: not independently verified</p>
+      <p class="card-note">No match doesn't mean a call is safe. Never share codes or move money based only on a call.</p>
+    </article>
+  </section>
+
+  <footer class="call-bar">
+    <div class="role-switch" role="group" aria-label="This phone is">
+      <button id="role-caller" class="role-btn" type="button">Caller</button>
+      <button id="role-receiver" class="role-btn" type="button">Receiver</button>
+    </div>
+    <div class="controls">
+      <button id="speaker-btn" class="control active" type="button" disabled aria-label="Toggle speaker">
+        <span class="control-icon" id="speaker-icon">${ICONS.speaker}</span><span class="control-label" id="speaker-label">Speaker on</span>
+      </button>
+      <button id="mute-btn" class="control" type="button" disabled aria-label="Mute microphone">
+        <span class="control-icon" id="mic-icon">${ICONS.mic}</span><span class="control-label" id="mute-label">Mute</span>
+      </button>
+      <button type="button" id="join-btn" class="control call-btn" aria-label="Start audio call">
+        <span class="control-icon" id="join-icon">${ICONS.phone}</span><span class="control-label" id="join-label">Call</span>
+      </button>
+    </div>
+  </footer>
+  <div id="audio-container" aria-hidden="true"></div>
 </main>`;
 
 function setInfo(message, isError = false) { $('info').textContent = message; $('info').classList.toggle('error', isError); }
@@ -67,8 +102,10 @@ function updateRole() {
 function setState(state) {
   const busy = state === 'connecting'; joined = state === 'connected'; connecting = busy;
   $('join-btn').disabled = busy;
-  $('join-label').textContent = busy ? 'Connecting…' : joined ? 'Hang up' : 'Start audio call';
-  $('join-icon').textContent = joined ? '✕' : '☎';
+  $('join-label').textContent = busy ? 'Connecting' : joined ? 'End' : 'Call';
+  $('join-btn').setAttribute('aria-label', joined ? 'Hang up' : 'Start audio call');
+  $('join-icon').innerHTML = ICONS.phone;
+  document.body.dataset.call = state;
   $('join-btn').classList.toggle('hangup', joined);
   $('mute-btn').disabled = !joined;
   $('speaker-btn').disabled = !joined;
@@ -131,7 +168,7 @@ async function startCall() {
     setState('connected');
     timer = setInterval(updateTimer, 1000);
     updateTimer(); refreshPeerStatus();
-    $('mute-label').textContent = 'Mute'; $('mic-icon').textContent = '🎙'; $('mute-btn').classList.remove('off');
+    $('mute-label').textContent = 'Mute'; $('mic-icon').innerHTML = ICONS.mic; $('mute-btn').classList.remove('off');
     if (!newRoom.canPlaybackAudio) setInfo('Connected. Tap Speaker on to enable remote audio.');
   } catch (error) {
     if (micTrack) micTrack.stop();
@@ -150,7 +187,7 @@ $('role-receiver').addEventListener('click', () => { if (!joined && !connecting)
 $('mute-btn').addEventListener('click', async () => {
   if (!room) return;
   const enabled = !room.localParticipant.isMicrophoneEnabled;
-  try { await room.localParticipant.setMicrophoneEnabled(enabled); $('mute-label').textContent = enabled ? 'Mute' : 'Unmute'; $('mic-icon').textContent = enabled ? '🎙' : '🔇'; $('mute-btn').classList.toggle('off', !enabled); }
+  try { await room.localParticipant.setMicrophoneEnabled(enabled); $('mute-label').textContent = enabled ? 'Mute' : 'Unmute'; $('mic-icon').innerHTML = enabled ? ICONS.mic : ICONS.micOff; $('mute-btn').classList.toggle('off', !enabled); }
   catch (error) { setInfo(`Microphone error: ${error.message}`, true); }
 });
 $('speaker-btn').addEventListener('click', async () => {
@@ -160,7 +197,7 @@ $('speaker-btn').addEventListener('click', async () => {
   speakerEnabled = !speakerEnabled;
   for (const el of audioElements.values()) { el.muted = !speakerEnabled; if (speakerEnabled) await el.play().catch(() => {}); }
   $('speaker-label').textContent = speakerEnabled ? 'Speaker on' : 'Speaker off';
-  $('speaker-icon').textContent = speakerEnabled ? '🔊' : '🔇';
+  $('speaker-icon').innerHTML = speakerEnabled ? ICONS.speaker : ICONS.speakerOff;
   $('speaker-btn').classList.toggle('off', !speakerEnabled);
   $('speaker-btn').classList.toggle('active', speakerEnabled);
 });
