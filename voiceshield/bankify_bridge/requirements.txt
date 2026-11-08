@@ -1,0 +1,5 @@
+livekit>=1.0,<2
+livekit-api>=1.0,<2
+numpy>=1.24,<3
+# Bankify dependencies (also install in README):
+# torch transformers scikit-learn joblib librosa soundfile

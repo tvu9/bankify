@@ -1,0 +1,12 @@
+{
+  "name": "livekit-audio-phone",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 127.0.0.1"
+  },
+  "dependencies": {"livekit-client": "^2.23.0"},
+  "devDependencies": {"vite": "^7.1.0"}
+}

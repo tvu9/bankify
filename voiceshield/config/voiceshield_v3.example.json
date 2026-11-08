@@ -1,0 +1,12 @@
+{
+  "release": "VoiceShield V3 - evidence-driven detector evaluation",
+  "production_model": "PellaV2 (unchanged pretrained weights)",
+  "audio_sample_rate_hz": 16000,
+  "window_seconds": 4,
+  "hop_seconds": 1,
+  "recommended_device_macos_14": "cpu",
+  "calibration": "offline validation only; NOT deployed",
+  "default_runtime_thresholds": "Existing V2 thresholds unchanged until call-level validation",
+  "training": "hold: collect consented labeled telephony data; evaluate before fine tuning",
+  "model_replacement": "hold: independent held-out accuracy and speed comparison required"
+}

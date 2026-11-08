@@ -1,0 +1,11 @@
+# Replace your existing ~/telephony/Caddyfile with these two sites.
+# Keep port 8443 unchanged; port 8444 serves the custom phone interface.
+https://10.255.104.249:8443 {
+    tls internal
+    reverse_proxy 127.0.0.1:7880
+}
+
+https://10.255.104.249:8444 {
+    tls internal
+    reverse_proxy 127.0.0.1:3000
+}
